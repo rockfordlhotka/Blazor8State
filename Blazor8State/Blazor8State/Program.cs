@@ -11,7 +11,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddScoped<StateService>();
+builder.Services.AddSingleton<SessionList>();
 
 var app = builder.Build();
 

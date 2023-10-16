@@ -1,6 +1,6 @@
 ﻿@page "/"
-@inject StateService state
 @inject IHttpContextAccessor hca
+@inject SessionList sessions
 
 <PageTitle>Home</PageTitle>
 
@@ -10,19 +10,41 @@ Welcome to your new app.
 
 <p>@myCookieValue</p>
 
-<p>State: @state.ServiceId</p>
+@if (services is not null && state is not null)
+{
+  <p>State: @state.ServiceId</p>
+}
 
 @code
 {
   private string myCookieValue = "<unread>";
+  private SessionServices services;
+  private StateService state;
 
   protected override void OnInitialized()
   {
     var httpContext = hca.HttpContext;
     if (httpContext is not null && !httpContext.Request.Cookies.ContainsKey("sessionId"))
-      httpContext.Response.Cookies.Append("sessionId", Guid.NewGuid().ToString());
+    {
+      myCookieValue = Guid.NewGuid().ToString();
+      httpContext.Response.Cookies.Append("sessionId", myCookieValue);
+    }
 
     if (httpContext is not null && httpContext.Request.Cookies.ContainsKey("sessionId"))
+    {
       myCookieValue = httpContext.Request.Cookies["sessionId"];
+    }
+
+    if (!sessions.ContainsKey(myCookieValue))
+    {
+      services = new SessionServices();
+      sessions.Add(myCookieValue, services);
+      services.Add(typeof(StateService), new StateService());
+    }
+    else
+    {
+      services = sessions[myCookieValue];
+    }
+    state = (StateService)services[typeof(StateService)];
   }
 }
