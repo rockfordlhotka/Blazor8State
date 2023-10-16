@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34205.153
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor8State", "Blazor8State\Blazor8State\Blazor8State.csproj", "{9C2A90CD-8638-4C2B-87CD-F3DC7D99D083}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor8State", "Blazor8State\Blazor8State\Blazor8State.csproj", "{9C2A90CD-8638-4C2B-87CD-F3DC7D99D083}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor8State.Client", "Blazor8State\Blazor8State.Client\Blazor8State.Client.csproj", "{EEE877AF-09EE-44A9-8670-BC3EE91847D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor8State.Client", "Blazor8State\Blazor8State.Client\Blazor8State.Client.csproj", "{EEE877AF-09EE-44A9-8670-BC3EE91847D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

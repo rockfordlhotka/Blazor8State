@@ -1,8 +1,11 @@
 ﻿@page "/counter"
 @attribute [RenderModeInteractiveAuto]
 @inject StateService state
+@inject IJSRuntime JsRuntime;
 
 <PageTitle>Counter</PageTitle>
+
+<p>@myCookieValue</p>
 
 <p>State: @state.ServiceId</p>
 
@@ -14,6 +17,16 @@
 
 @code {
     private int currentCount = 0;
+    private string myCookieValue = "<unread>";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            myCookieValue = await JsRuntime.InvokeAsync<string>("ReadCookie.ReadCookie", "sessionId");
+            StateHasChanged();
+        }
+    }
 
     private void IncrementCount()
     {

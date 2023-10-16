@@ -1,8 +1,11 @@
 ﻿@page "/weather"
 @attribute [StreamRendering(true)]
 @inject StateService state
+@inject IHttpContextAccessor hca
 
 <PageTitle>Weather</PageTitle>
+
+<p>@myCookieValue</p>
 
 <p>State: @state.ServiceId</p>
 
@@ -41,9 +44,14 @@ else
 
 @code {
     private WeatherForecast[]? forecasts;
+    private string myCookieValue = "<unread>";
 
     protected override async Task OnInitializedAsync()
     {
+        var httpContext = hca.HttpContext;
+        if (httpContext is not null && httpContext.Request.Cookies.ContainsKey("sessionId"))
+            myCookieValue = httpContext.Request.Cookies["sessionId"];
+
         // Simulate asynchronous loading to demonstrate streaming rendering
         await Task.Delay(500);
 

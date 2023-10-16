@@ -9,6 +9,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddScoped<StateService>();
 
 var app = builder.Build();
