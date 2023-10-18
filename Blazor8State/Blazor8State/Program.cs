@@ -9,9 +9,11 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddControllers();
+
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddSingleton<SessionList>();
+builder.Services.AddSingleton<SessionManager>();
 
 var app = builder.Build();
 
@@ -31,6 +33,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.MapControllers();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()

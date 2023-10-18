@@ -1,15 +1,15 @@
 ﻿@page "/counter"
 @attribute [RenderModeInteractiveAuto]
-@inject SessionList sessions
+@inject SessionManager sessions
 @inject IJSRuntime JsRuntime
 
 <PageTitle>Counter</PageTitle>
 
 <p>@myCookieValue</p>
 
-@if (services is not null && state is not null)
+@if (services is not null)
 {
-    <p>State: @state.ServiceId</p>
+    <p>State: @mystate</p>
 }
 
 <h1>Counter</h1>
@@ -21,16 +21,16 @@
 @code {
     private int currentCount = 0;
     private string myCookieValue = "<unread>";
-    private SessionServices services;
-    private StateService state;
+    private Session services;
+    private string mystate;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             myCookieValue = await JsRuntime.InvokeAsync<string>("ReadCookie.ReadCookie", "sessionId");
-            services = sessions[myCookieValue];
-            state = (StateService)services[typeof(StateService)];
+            services = await sessions.GetSession(myCookieValue);
+            mystate = (string)services["mystate"];
             StateHasChanged();
         }
     }
