@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject IHttpContextAccessor hca
 @inject SessionManager sessions
+@implements IDisposable
 
 <PageTitle>Home</PageTitle>
 
@@ -10,7 +11,7 @@ Welcome to your new app.
 
 <p>@myCookieValue</p>
 
-@if (services is not null)
+@if (session is not null)
 {
     <p>State: @mystate</p>
 }
@@ -18,7 +19,7 @@ Welcome to your new app.
 @code
 {
     private string myCookieValue = "<unread>";
-    private Session services;
+    private Session session;
     private string mystate;
 
     protected override async Task OnInitializedAsync()
@@ -37,14 +38,26 @@ Welcome to your new app.
 
         if (!sessions.Contains(myCookieValue))
         {
-            services = new Session();
-            sessions.Add(myCookieValue, services);
-            services.Add("mystate", Guid.NewGuid().ToString());
+            session = new Session();
+            sessions.Add(myCookieValue, session);
+            session.Add("mystate", Guid.NewGuid().ToString());
         }
         else
         {
-            services = await sessions.GetSession(myCookieValue);
+            session = await sessions.GetSession(myCookieValue);
         }
-        mystate = (string)services["mystate"];
+        session.Changed += SessionChanged;
+        mystate = (string)session["mystate"];
+    }
+
+    private void SessionChanged()
+    {
+        mystate = (string)session["mystate"];
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        session.Changed -= SessionChanged; 
     }
 }

@@ -2,12 +2,13 @@
 @attribute [RenderModeInteractiveAuto]
 @inject SessionManager sessions
 @inject IJSRuntime JsRuntime
+@implements IDisposable
 
 <PageTitle>Counter</PageTitle>
 
 <p>@myCookieValue</p>
 
-@if (services is not null)
+@if (session is not null)
 {
     <p>State: @mystate</p>
 }
@@ -21,7 +22,7 @@
 @code {
     private int currentCount = 0;
     private string myCookieValue = "<unread>";
-    private Session services;
+    private Session session;
     private string mystate;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -29,8 +30,8 @@
         if (firstRender)
         {
             myCookieValue = await JsRuntime.InvokeAsync<string>("ReadCookie.ReadCookie", "sessionId");
-            services = await sessions.GetSession(myCookieValue);
-            mystate = (string)services["mystate"];
+            session = await sessions.GetSession(myCookieValue);
+            mystate = (string)session["mystate"];
             StateHasChanged();
         }
     }
@@ -38,5 +39,12 @@
     private void IncrementCount()
     {
         currentCount++;
+        mystate = Guid.NewGuid().ToString();
+        session["mystate"] = mystate;
+    }
+
+    public void Dispose()
+    {
+        sessions.UpdateSession(myCookieValue, session);
     }
 }

@@ -26,5 +26,13 @@ namespace WebApi1.Controllers
             var session = await _sessionList.GetSession(sessionId);
             return session;
         }
+
+        [HttpPut(Name = "UpdateState")]
+        public async Task Put(Session updatedSession)
+        {
+            var httpContext = _contextAccessor.HttpContext;
+            var sessionId = httpContext.Request.Cookies["sessionId"];
+            await _sessionList.UpdateSession(sessionId, updatedSession);
+        }
     }
 }
