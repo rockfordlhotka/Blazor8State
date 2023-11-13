@@ -6,7 +6,7 @@
 
 <PageTitle>Counter</PageTitle>
 
-<p>@myCookieValue</p>
+<p>Cookie: @myCookieValue</p>
 
 @if (session is not null)
 {
@@ -41,6 +41,7 @@
         currentCount++;
         mystate = Guid.NewGuid().ToString();
         session["mystate"] = mystate;
+        sessions.UpdateSession(myCookieValue, session);
     }
 
     public void Dispose()
