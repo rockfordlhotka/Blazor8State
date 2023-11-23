@@ -1,5 +1,5 @@
 ﻿@page "/weather"
-@attribute [StreamRendering(true)]
+@attribute [StreamRendering]
 @inject IHttpContextAccessor hca
 @inject SessionManager sessions
 
@@ -48,8 +48,8 @@ else
 @code {
     private WeatherForecast[]? forecasts;
     private string myCookieValue = "<unread>";
-    private Session services;
-    private string mystate;
+    private Session services = new Session();
+    private string mystate = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {

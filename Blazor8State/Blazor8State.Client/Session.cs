@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Blazor8State.Client
+﻿namespace Blazor8State.Client
 {
     /// <summary>
     /// Per-user session data. The object must be 
@@ -8,11 +6,10 @@ namespace Blazor8State.Client
     /// </summary>
     public class Session : Dictionary<string, string>
     {
-        public Action Changed { get; set; }
-
-        public void OnChanged()
-        {
-            Changed?.Invoke();
-        }
+        /// <summary>
+        /// Gets or sets the Session Id value.
+        /// </summary>
+        public string SessionId { get; set; } = string.Empty;
+        public bool IsCheckedOut { get; set; }
     }
 }

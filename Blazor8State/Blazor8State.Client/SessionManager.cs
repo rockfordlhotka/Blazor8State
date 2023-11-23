@@ -23,37 +23,61 @@ namespace Blazor8State.Client
                 else
                    _sessions[key] = result;
             }
+            else
+            {
+                // ensure value isn't checked out
+                var session = _sessions[key];
+                while (session.IsCheckedOut) 
+                    await Task.Delay(5);
+            }
             return _sessions[key];
         }
 
-        public async Task UpdateSession(string key, Session session)
+        public async Task<Session?> UpdateSession(string key, Session session)
         {
-            if (session == null) return;
-            var isBrowser = (System.Environment.OSVersion.Platform == PlatformID.Other);
-            if (isBrowser)
+            Session? result = null;
+            if (session != null)
             {
-                var client = new HttpClient();
-                client.BaseAddress = new Uri("https://localhost:7095/");
-                await client.PutAsJsonAsync<Session>("state", session);
+                session.SessionId = key;
+                var isBrowser = (System.Environment.OSVersion.Platform == PlatformID.Other);
+                if (isBrowser)
+                {
+                    var client = new HttpClient();
+                    client.BaseAddress = new Uri("https://localhost:7095/");
+                    await client.PutAsJsonAsync<Session>("state", session);
+                    result = session;
+                }
+                else
+                {
+                    Replace(session, _sessions[key]);
+                    result = _sessions[key];
+                    session.IsCheckedOut = false;
+                    result.IsCheckedOut = false;
+                }
             }
-            else
-            {
-                Replace(session, _sessions[key]);
-            }
+            return result;
         }
 
+        /// <summary>
+        /// Replace the contents of oldSession with the items
+        /// in newSession.
+        /// </summary>
+        /// <param name="newSession"></param>
+        /// <param name="oldSession"></param>
         private void Replace(Session newSession, Session oldSession)
         {
             oldSession.Clear();
             foreach (var key in newSession.Keys)
                 oldSession.Add(key, newSession[key]);
-            oldSession.OnChanged();
         }
 
         public bool Contains(string key)
         { return _sessions.ContainsKey(key); }
 
         public void Add(string key, Session session)
-        { _sessions[key] = session; }
+        {
+            session.SessionId = key;           
+            _sessions[key] = session; 
+        }
     }
 }

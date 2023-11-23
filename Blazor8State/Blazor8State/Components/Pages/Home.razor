@@ -1,7 +1,7 @@
 ﻿@page "/"
+@attribute [StreamRendering]
 @inject IHttpContextAccessor hca
 @inject SessionManager sessions
-@implements IDisposable
 
 <PageTitle>Home</PageTitle>
 
@@ -19,8 +19,8 @@ Welcome to your new app.
 @code
 {
     private string myCookieValue = "<unread>";
-    private Session session;
-    private string mystate;
+    private Session session = new Session();
+    private string mystate = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,18 +46,6 @@ Welcome to your new app.
         {
             session = await sessions.GetSession(myCookieValue);
         }
-        session.Changed += SessionChanged;
         mystate = (string)session["mystate"];
-    }
-
-    private void SessionChanged()
-    {
-        mystate = (string)session["mystate"];
-        StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        session.Changed -= SessionChanged; 
     }
 }

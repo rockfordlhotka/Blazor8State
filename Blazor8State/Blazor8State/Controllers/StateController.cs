@@ -24,6 +24,7 @@ namespace WebApi1.Controllers
             var httpContext = _contextAccessor.HttpContext;
             var sessionId = httpContext.Request.Cookies["sessionId"];
             var session = await _sessionList.GetSession(sessionId);
+            session.IsCheckedOut = true;
             return session;
         }
 
@@ -31,8 +32,11 @@ namespace WebApi1.Controllers
         public async Task Put(Session updatedSession)
         {
             var httpContext = _contextAccessor.HttpContext;
-            var sessionId = httpContext.Request.Cookies["sessionId"];
-            await _sessionList.UpdateSession(sessionId, updatedSession);
+            if (httpContext is not null)
+            {
+                var sessionId = httpContext.Request.Cookies["sessionId"];
+                var result = await _sessionList.UpdateSession(sessionId, updatedSession);
+            }
         }
     }
 }

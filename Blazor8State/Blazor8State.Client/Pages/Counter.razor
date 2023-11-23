@@ -1,5 +1,6 @@
 ﻿@page "/counter"
-@attribute [RenderModeInteractiveAuto]
+@rendermode InteractiveAuto
+@* @rendermode @(new InteractiveAutoRenderMode(prerender: false)) *@
 @inject SessionManager sessions
 @inject IJSRuntime JsRuntime
 @implements IDisposable
@@ -41,7 +42,7 @@
         currentCount++;
         mystate = Guid.NewGuid().ToString();
         session["mystate"] = mystate;
-        sessions.UpdateSession(myCookieValue, session);
+        // sessions.UpdateSession(myCookieValue, session);
     }
 
     public void Dispose()
