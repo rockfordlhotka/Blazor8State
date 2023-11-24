@@ -1,4 +1,4 @@
-using Blazor8State.Client;
+using Blazor8State;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi1.Controllers
@@ -8,35 +8,26 @@ namespace WebApi1.Controllers
     public class StateController : ControllerBase
     {
         private readonly ILogger<StateController> _logger;
-        private readonly SessionManager _sessionList;
-        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly ISessionManager _sessionList;
 
-        public StateController(SessionManager sessionList, IHttpContextAccessor httpContextAccessor, ILogger<StateController> logger)
+        public StateController(ISessionManager sessionList, ILogger<StateController> logger)
         {
             _logger = logger;
             _sessionList = sessionList;
-            _contextAccessor = httpContextAccessor;
         }
 
         [HttpGet(Name = "GetState")]
-        public async Task<Session> Get()
+        public async Task<Blazor8State.Client.Session> Get()
         {
-            var httpContext = _contextAccessor.HttpContext;
-            var sessionId = httpContext.Request.Cookies["sessionId"];
-            var session = await _sessionList.GetSession(sessionId);
+            var session = await _sessionList.GetSession();
             session.IsCheckedOut = true;
             return session;
         }
 
         [HttpPut(Name = "UpdateState")]
-        public async Task Put(Session updatedSession)
+        public async Task Put(Blazor8State.Client.Session updatedSession)
         {
-            var httpContext = _contextAccessor.HttpContext;
-            if (httpContext is not null)
-            {
-                var sessionId = httpContext.Request.Cookies["sessionId"];
-                var result = await _sessionList.UpdateSession(sessionId, updatedSession);
-            }
+            await _sessionList.UpdateSession(updatedSession);
         }
     }
 }

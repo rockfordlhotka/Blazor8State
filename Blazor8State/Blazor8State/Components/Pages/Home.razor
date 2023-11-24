@@ -1,7 +1,6 @@
 ﻿@page "/"
 @attribute [StreamRendering]
-@inject IHttpContextAccessor hca
-@inject SessionManager sessions
+@inject ISessionManager sessions
 
 <PageTitle>Home</PageTitle>
 
@@ -9,43 +8,16 @@
 
 Welcome to your new app.
 
-<p>Cookie: @myCookieValue</p>
-
-@if (session is not null)
-{
-    <p>State: @mystate</p>
-}
+<p>State: @mystate</p>
 
 @code
 {
-    private string myCookieValue = "<unread>";
-    private Session session = new Session();
     private string mystate = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        var httpContext = hca.HttpContext;
-        if (httpContext is not null && !httpContext.Request.Cookies.ContainsKey("sessionId"))
-        {
-            myCookieValue = Guid.NewGuid().ToString();
-            httpContext.Response.Cookies.Append("sessionId", myCookieValue);
-        }
-
-        if (httpContext is not null && httpContext.Request.Cookies.ContainsKey("sessionId"))
-        {
-            myCookieValue = httpContext.Request.Cookies["sessionId"];
-        }
-
-        if (!sessions.Contains(myCookieValue))
-        {
-            session = new Session();
-            sessions.Add(myCookieValue, session);
-            session.Add("mystate", Guid.NewGuid().ToString());
-        }
-        else
-        {
-            session = await sessions.GetSession(myCookieValue);
-        }
+        var session = await sessions.GetSession();
+        session.TryAdd("mystate", Guid.NewGuid().ToString());
         mystate = (string)session["mystate"];
     }
 }

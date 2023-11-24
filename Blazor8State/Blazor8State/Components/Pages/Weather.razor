@@ -1,16 +1,13 @@
 ﻿@page "/weather"
 @attribute [StreamRendering]
-@inject IHttpContextAccessor hca
-@inject SessionManager sessions
+@inject ISessionManager sessions
+@inject ISessionIdManager sessionIdManager
 
 <PageTitle>Weather</PageTitle>
 
-<p>Cookie: @myCookieValue</p>
+<p>Cookie: @sessionId</p>
 
-@if (services is not null)
-{
-    <p>State: @mystate</p>
-}
+<p>State: @mystate</p>
 
 <h1>Weather</h1>
 
@@ -47,18 +44,13 @@ else
 
 @code {
     private WeatherForecast[]? forecasts;
-    private string myCookieValue = "<unread>";
-    private Session services = new Session();
     private string mystate = string.Empty;
+    private string? sessionId;
 
     protected override async Task OnInitializedAsync()
     {
-        var httpContext = hca.HttpContext;
-        if (httpContext is not null && httpContext.Request.Cookies.ContainsKey("sessionId"))
-        {
-            myCookieValue = httpContext.Request.Cookies["sessionId"];
-            services = await sessions.GetSession(myCookieValue);
-        }
+        sessionId = await sessionIdManager.GetSessionId();
+        var services = await sessions.GetSession();
         mystate = (string)services["mystate"];
 
         // Simulate asynchronous loading to demonstrate streaming rendering

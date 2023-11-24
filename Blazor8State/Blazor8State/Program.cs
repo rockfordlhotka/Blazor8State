@@ -1,4 +1,4 @@
-using Blazor8State.Client;
+using Blazor8State;
 using Blazor8State.Client.Pages;
 using Blazor8State.Components;
 
@@ -13,7 +13,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddSingleton<SessionManager>();
+builder.Services.AddSingleton(typeof(ISessionManager), typeof(SessionManager));
+builder.Services.AddTransient(typeof(ISessionIdManager), typeof(SessionIdManager));
 
 var app = builder.Build();
 

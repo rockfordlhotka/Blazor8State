@@ -1,18 +1,17 @@
 ﻿@page "/counter"
 @rendermode InteractiveAuto
 @* @rendermode @(new InteractiveAutoRenderMode(prerender: false)) *@
-@inject SessionManager sessions
-@inject IJSRuntime JsRuntime
+@inject ISessionManager sessions
+@inject ISessionIdManager sessionIdManager
 @implements IDisposable
 
 <PageTitle>Counter</PageTitle>
 
-<p>Cookie: @myCookieValue</p>
+<p>render location: @renderLocation</p>
 
-@if (session is not null)
-{
-    <p>State: @mystate</p>
-}
+<p>Cookie: @sessionId</p>
+
+<p>State: @mystate</p>
 
 <h1>Counter</h1>
 
@@ -22,18 +21,44 @@
 
 @code {
     private int currentCount = 0;
-    private string myCookieValue = "<unread>";
-    private Session session;
     private string mystate;
+    private string renderLocation;
+    private Session session;
+    private string? sessionId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isBrowser = (System.Environment.OSVersion.Platform == PlatformID.Other);
+        if (!isBrowser)
+        {
+            renderLocation = "server";
+            sessionId = await sessionIdManager.GetSessionId();
+            session = await sessions.GetSession();
+            mystate = (string)session["mystate"];
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        var isBrowser = (System.Environment.OSVersion.Platform == PlatformID.Other);
+        if (isBrowser)
         {
-            myCookieValue = await JsRuntime.InvokeAsync<string>("ReadCookie.ReadCookie", "sessionId");
-            session = await sessions.GetSession(myCookieValue);
-            mystate = (string)session["mystate"];
-            StateHasChanged();
+            if (firstRender)
+            {
+                renderLocation = "wasm";
+                sessionId = await sessionIdManager.GetSessionId();
+                StateHasChanged();
+                session = await sessions.GetSession();
+                try
+                {
+                    mystate = (string)session["mystate"];
+                }
+                catch (Exception ex)
+                {
+                    mystate = ex.Message;
+                }
+                StateHasChanged();
+            }
         }
     }
 
@@ -42,11 +67,14 @@
         currentCount++;
         mystate = Guid.NewGuid().ToString();
         session["mystate"] = mystate;
-        // sessions.UpdateSession(myCookieValue, session);
     }
 
     public void Dispose()
     {
-        sessions.UpdateSession(myCookieValue, session);
+        var isBrowser = (System.Environment.OSVersion.Platform == PlatformID.Other);
+        if (isBrowser)
+        {
+            sessions.UpdateSession(session);
+        }
     }
 }
