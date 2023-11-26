@@ -1,6 +1,7 @@
 ﻿@page "/"
 @attribute [StreamRendering]
 @inject ISessionManager sessions
+@inject ISessionIdManager idManager
 
 <PageTitle>Home</PageTitle>
 
@@ -19,5 +20,6 @@ Welcome to your new app.
         var session = await sessions.GetSession();
         session.TryAdd("mystate", Guid.NewGuid().ToString());
         mystate = (string)session["mystate"];
+        StateHasChanged();
     }
 }

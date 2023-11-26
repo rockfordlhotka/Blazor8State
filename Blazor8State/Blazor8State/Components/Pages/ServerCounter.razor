@@ -1,0 +1,49 @@
+﻿@page "/servercounter"
+@rendermode InteractiveServer
+@inject ISessionManager sessions
+@inject ISessionIdManager sessionIdManager
+
+<PageTitle>Server Counter</PageTitle>
+
+<p>render location: @renderLocation</p>
+
+<p>Cookie: @sessionId</p>
+
+<p>State: @mystate</p>
+
+<h1>Server Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+    private int currentCount = 0;
+    private string mystate;
+    private string renderLocation;
+    private Session session;
+    private string? sessionId;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        renderLocation = "server";
+        sessionId = await sessionIdManager.GetSessionId();
+        session = await sessions.GetSession();
+        try
+        {
+            mystate = (string)session["mystate"];
+        }
+        catch (Exception ex)
+        {
+            mystate = ex.Message;
+        }
+        StateHasChanged();
+    }
+
+    private void IncrementCount()
+    {
+        currentCount++;
+        mystate = Guid.NewGuid().ToString();
+        session["mystate"] = mystate;
+    }
+}

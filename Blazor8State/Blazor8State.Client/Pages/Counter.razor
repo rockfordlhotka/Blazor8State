@@ -17,7 +17,8 @@
 
 <p role="status">Current count: @currentCount</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="IncrementCount"
+    disabled="@IsStaticRender">Click me</button>
 
 @code {
     private int currentCount = 0;
@@ -25,21 +26,31 @@
     private string renderLocation;
     private Session session;
     private string? sessionId;
+    private bool IsStaticRender;
 
     protected override async Task OnInitializedAsync()
     {
+        IsStaticRender = true;
         var isBrowser = (System.Environment.OSVersion.Platform == PlatformID.Other);
         if (!isBrowser)
         {
             renderLocation = "server";
             sessionId = await sessionIdManager.GetSessionId();
             session = await sessions.GetSession();
-            mystate = (string)session["mystate"];
+            try
+            {
+                mystate = (string)session["mystate"];
+            }
+            catch (Exception ex)
+            {
+                mystate = ex.Message;
+            }
         }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        IsStaticRender = false;
         var isBrowser = (System.Environment.OSVersion.Platform == PlatformID.Other);
         if (isBrowser)
         {
@@ -57,6 +68,13 @@
                 {
                     mystate = ex.Message;
                 }
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            if (firstRender)
+            {
                 StateHasChanged();
             }
         }

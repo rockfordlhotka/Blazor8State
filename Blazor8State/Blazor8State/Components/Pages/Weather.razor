@@ -50,8 +50,15 @@ else
     protected override async Task OnInitializedAsync()
     {
         sessionId = await sessionIdManager.GetSessionId();
-        var services = await sessions.GetSession();
-        mystate = (string)services["mystate"];
+        var session = await sessions.GetSession();
+        try
+        {
+            mystate = (string)session["mystate"];
+        }
+        catch (Exception ex)
+        {
+            mystate = ex.Message;
+        }
 
         // Simulate asynchronous loading to demonstrate streaming rendering
         await Task.Delay(500);

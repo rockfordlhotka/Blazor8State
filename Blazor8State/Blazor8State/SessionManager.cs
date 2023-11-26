@@ -19,11 +19,11 @@ namespace Blazor8State
         public async Task<Session> GetSession()
         {
             var key = await _sessionIdManager.GetSessionId();
-            if (!_sessions.ContainsKey(key)) 
+            if (!_sessions.ContainsKey(key))
                 _sessions.Add(key, new Session());
             var session = _sessions[key];
             // ensure session isn't checked out by wasm
-            while (session.IsCheckedOut) 
+            while (session.IsCheckedOut)
                 await Task.Delay(5);
 
             return session;
