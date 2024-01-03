@@ -1,4 +1,5 @@
 ﻿using Blazor8State.Client;
+using System.Threading;
 
 namespace Blazor8State
 {
@@ -23,8 +24,15 @@ namespace Blazor8State
                 _sessions.Add(key, new Session());
             var session = _sessions[key];
             // ensure session isn't checked out by wasm
+            //while (session.IsCheckedOut)
+            //    await Task.Delay(5);
+            var endTime = DateTime.Now + TimeSpan.FromSeconds(10);
             while (session.IsCheckedOut)
+            {
+                if (DateTime.Now > endTime)
+                    throw new TimeoutException();
                 await Task.Delay(5);
+            }
 
             return session;
         }
