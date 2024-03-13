@@ -2,21 +2,24 @@
 @attribute [StreamRendering]
 @inject ISessionManager sessions
 @inject ISessionIdManager idManager
+@inject ISessionIdManager sessionIdManager
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
+<p>Cookie: @sessionId</p>
 
 <p>State: @mystate</p>
 
 @code
 {
+    private string? sessionId;
     private string mystate = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        sessionId = await sessionIdManager.GetSessionId();
         var session = await sessions.GetSession();
         session.TryAdd("mystate", Guid.NewGuid().ToString());
         mystate = (string)session["mystate"];
