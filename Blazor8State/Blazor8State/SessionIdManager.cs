@@ -15,10 +15,15 @@
                 {
                     result = httpContext.Request.Cookies["sessionId"];
                 }
+                else if (httpContext.Items.ContainsKey("sessionId"))
+                {
+                    result = httpContext.Items["sessionId"]?.ToString();
+                }
                 else
                 {
                     result = Guid.NewGuid().ToString();
                     httpContext.Response.Cookies.Append("sessionId", result);
+                    httpContext.Items["sessionId"] = result;
                 }
             }
             else
