@@ -10,10 +10,10 @@ namespace WebApi1.Controllers
         private readonly ILogger<StateController> _logger;
         private readonly ISessionManager _sessionList;
 
-        public StateController(ISessionManager sessionList, ILogger<StateController> logger)
+        public StateController(ISessionManager sessionManager, ILogger<StateController> logger)
         {
             _logger = logger;
-            _sessionList = sessionList;
+            _sessionList = sessionManager;
         }
 
         [HttpGet(Name = "GetState")]
